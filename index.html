@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gara Main</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="fons">
+
+    <div class="galvenais_logs">
+        <h1>Gara Main</h1>
+        
+        <div id="kristalu_bloks" style="color: #00f2fe; margin-bottom: 12px; font-weight: bold; font-size: 18px;">
+             Kristāli: <span id="crystals">0</span> (x<span id="multiplier">1.0</span>)
+        </div>
+
+        <div class="skaititaja_bloks">
+            <span id="coins" style="font-size: 36px; font-weight: bold;">0</span> monētas
+            <br>
+            <small style="font-size: 16px;">(CPS: <span id="cps">0</span> | CPC: <span id="cpc">1</span>)</small>
+        </div>
+
+        <button id="akmens_poga"></button>
+
+        <div class="akmens_statistika">
+            <div>Klikšķa līm: <span id="click-level">1</span></div>
+            <div>Auto fani: <span id="upgrade-count">0</span></div>
+            <div style="color: #ffbe0b;">Krit. iespēja: <span id="crit-chance">1</span>%</div>
+        </div>
+
+        <div class="veikals">
+            <div class="veikala_lieta">
+                <button id="buy-click-upgrade">Klikšķis +1</button>
+            </div>
+
+            <div class="veikala_lieta">
+                <button id="buy-auto-clicker">Auto +1/s</button>
+            </div>
+
+            <div class="veikala_lieta">
+                <button id="buy-crit-upgrade">Krita iespēja +2%</button>
+            </div>
+        </div>
+
+        <div class="rebirth_prokachka">
+            <button id="rebirth-btn">Rebirth</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
