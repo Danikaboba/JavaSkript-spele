@@ -1,112 +1,168 @@
-.fons {
-    background-color: #2b2b2b;
-    color: #ffffff;
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+//IGROVOE SOSTOJANIE (STATE)
+let moneti = 0;
+let kolichestvo_avto = 0;
+let cena_avto = 10;
+let uroven_klika = 1;
+let cena_klika = 15;
+let shans_krita = 1; 
+let cena_krita = 50;
+let kamni = 0; 
+const TREBOVANIE_REBIRTHA = 1000; 
+
+let oshibka_klika_vremja, oshibka_avto_vremja, oshibka_krita_vremja, oshibka_rebirtha_vremja;
+
+//DOM ELEMENTI
+const ekran_monet = document.getElementById('moneti_schetchik');
+const ekran_cps_cpc = document.getElementById('cps_cpc_ekran'); // Объединенный экран для CPS и CPC
+const ekran_kamnej = document.getElementById('kamni_schetchik');
+
+const glavnij_kamen = document.getElementById('knopka_kamnja'); 
+const knopka_pokupki_avto = document.getElementById('kupit_avto');
+const knopka_pokupki_klika = document.getElementById('kupit_klik');
+const knopka_pokupki_krita = document.getElementById('kupit_krit');
+const knopka_samogo_rebirtha = document.getElementById('knopka_rebirtha');
+
+// Элементы статистики под камнем
+const ekran_urovnja_klika = document.getElementById('uroven_klika_schetchik');
+const ekran_kolichestva_avto = document.getElementById('kolichestvo_avto_schetchik');
+const ekran_shansa_krita = document.getElementById('shans_krita_schetchik');
+
+//RASCHETI
+function poluchit_mnozhitel() {
+    return 1 + (kamni * 0.5);
+}
+function poluchit_silu_klika() {
+    return uroven_klika * poluchit_mnozhitel();
+}
+function poluchit_avto_dohod() {
+    return kolichestvo_avto * poluchit_mnozhitel();
 }
 
-.glavnoe_okno {
-    text-align: center;
-    background-color: #3d3d3d;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.5);
-    width: 360px;
+//OBNOVLENIE EKRANA (UI)
+function obnovit_ekran() {
+    //Выводим просто число монет
+    ekran_monet.textContent = Math.floor(moneti);
+    
+    //Обновляем строчку с камнями целиком
+    ekran_kamnej.textContent = `Akmeņi: ${kamni} (x${poluchit_mnozhitel().toFixed(1)})`;
+    
+    //Обновляем строчку CPS и CPC целиком
+    ekran_cps_cpc.textContent = `(CPS: ${poluchit_avto_dohod().toFixed(1)} | CPC: ${poluchit_silu_klika().toFixed(1)})`;
+
+    //Обновляем статистику под камнем целиком
+    ekran_urovnja_klika.textContent = `Klikšķa līm: ${uroven_klika}`;
+    ekran_kolichestva_avto.textContent = `Auto fani: ${kolichestvo_avto}`;
+    ekran_shansa_krita.textContent = `Krita iespēja: ${shans_krita}%`;
+
+    //Тексты кнопок (если нет ошибок)
+    if (!oshibka_klika_vremja) {
+        knopka_pokupki_klika.textContent = `Klikšķis +1 (${cena_klika})`;
+    }
+    if (!oshibka_avto_vremja) {
+        knopka_pokupki_avto.textContent = `Auto +1/s (${cena_avto})`;
+    }
+    if (!oshibka_krita_vremja) {
+        if (shans_krita >= 50) {
+            knopka_pokupki_krita.textContent = "MAX līmenis";
+        } else {
+            knopka_pokupki_krita.textContent = `Krita iespēja +2% (${cena_krita})`;
+        }
+    }
+    if (!oshibka_rebirtha_vremja) {
+        knopka_samogo_rebirtha.textContent = `Rebirth (Maksā: ${TREBOVANIE_REBIRTHA})`;
+    }
 }
 
-h1 {
-    font-size: 32px;
-    margin-top: 0;
-    margin-bottom: 15px;
-}
+//NAZHATIJA
+glavnij_kamen.addEventListener('click', () => {
+    let tekushaja_sila_klika = poluchit_silu_klika();
+    const eto_krit = Math.floor(Math.random() * 100) + 1 <= shans_krita;
+    if (eto_krit) {
+        tekushaja_sila_klika = tekushaja_sila_klika * 10; 
+    }
+    moneti += tekushaja_sila_klika;
+    obnovit_ekran();
+});
 
-/* Стиль для текста камней */
-.tekst_kamney {
-    color: #a8a8a8; 
-    margin-bottom: 12px; 
-    font-weight: bold; 
-    font-size: 18px;
-}
+knopka_pokupki_klika.addEventListener('click', () => {
+    if (moneti >= cena_klika) {
+        moneti -= cena_klika;
+        uroven_klika += 1;
+        cena_klika = Math.round(cena_klika * 1.5);
+        obnovit_ekran();
+    } else {
+        let ne_hvataet = cena_klika - Math.floor(moneti);
+        knopka_pokupki_klika.textContent = `Trūkst ${ne_hvataet} monētas!`;
+        clearTimeout(oshibka_klika_vremja); 
+        oshibka_klika_vremja = setTimeout(() => {
+            oshibka_klika_vremja = null;
+            obnovit_ekran();
+        }, 1500);
+    }
+});
 
-/* Настройки главного счетчика монет */
-.bolshie_moneti {
-    font-size: 36px; 
-    font-weight: bold;
-}
+knopka_pokupki_avto.addEventListener('click', () => {
+    if (moneti >= cena_avto) {
+        moneti -= cena_avto;
+        kolichestvo_avto += 1;
+        cena_avto = Math.round(cena_avto * 1.4);
+        obnovit_ekran();
+    } else {
+        let ne_hvataet = cena_avto - Math.floor(moneti);
+        knopka_pokupki_avto.textContent = `Trūkst ${ne_hvataet} monētas!`;
+        clearTimeout(oshibka_avto_vremja);
+        oshibka_avto_vremja = setTimeout(() => {
+            oshibka_avto_vremja = null;
+            obnovit_ekran();
+        }, 1500);
+    }
+});
 
-.tekst_monet {
-    font-size: 20px;
-    margin-bottom: 5px;
-}
+knopka_pokupki_krita.addEventListener('click', () => {
+    if (shans_krita >= 50) return;
+    if (moneti >= cena_krita) {
+        moneti -= cena_krita;
+        shans_krita += 2; 
+        cena_krita = Math.round(cena_krita * 2.2); 
+        obnovit_ekran();
+    } else {
+        let ne_hvataet = cena_krita - Math.floor(moneti);
+        knopka_pokupki_krita.textContent = `Trūkst ${ne_hvataet} monētas!`;
+        clearTimeout(oshibka_krita_vremja);
+        oshibka_krita_vremja = setTimeout(() => {
+            oshibka_krita_vremja = null;
+            obnovit_ekran();
+        }, 1500);
+    }
+});
 
-.dop_tekst {
-    font-size: 16px;
-    color: #aaaaaa;
-}
+knopka_samogo_rebirtha.addEventListener('click', () => {
+    if (moneti >= TREBOVANIE_REBIRTHA) {
+        kamni += 1; 
+        moneti = 0;
+        kolichestvo_avto = 0;
+        cena_avto = 10;
+        uroven_klika = 1;
+        cena_klika = 15;
+        alert("Tu esi veiksmīgi atdzimis! Saņemts 1 Akmens.");
+        obnovit_ekran();
+    } else {
+        let ne_hvataet = TREBOVANIE_REBIRTHA - Math.floor(moneti);
+        knopka_samogo_rebirtha.textContent = `Trūkst ${ne_hvataet} monētas!`;
+        clearTimeout(oshibka_rebirtha_vremja);
+        oshibka_rebirtha_vremja = setTimeout(() => {
+            oshibka_rebirtha_vremja = null;
+            obnovit_ekran();
+        }, 1500);
+    }
+});
 
-#knopka_kamnja {
-    background-image: url('5798437966812553226.webp');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    width: 220px;  
-    height: 190px; 
-    border: none;
-    cursor: pointer;
-    transition: transform 0.05s;
-    margin: 25px auto 10px auto;
-    display: block;
-    filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.6)); 
-}
+//AUTOMATICHESKIJ CIKL
+setInterval(() => {
+    if (kolichestvo_avto > 0) {
+        moneti += poluchit_avto_dohod() / 10;
+        obnovit_ekran(); 
+    }
+}, 100);
 
-#knopka_kamnja:active {
-    transform: scale(0.92);
-    filter: drop-shadow(0px 4px 5px rgba(0,0,0,0.6));
-}
-
-.statistika_kamnja {
-    font-size: 14px;
-    color: #bbb;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 0 10px;
-}
-
-.magazin, .rebirth_prokachka {
-    margin-top: 20px;
-    border-top: 2px solid #555;
-    padding-top: 15px;
-}
-
-.vesh_magazina {
-    margin-bottom: 12px;
-}
-
-.vesh_magazina button, #knopka_rebirtha {
-    background-color: #ff3333; 
-    color: white;
-    border: none;              
-    padding: 12px 15px; 
-    font-size: 16px;    
-    cursor: pointer;
-    border-radius: 8px;
-    width: 100%;
-    font-weight: bold;
-    transition: background-color 0.1s, transform 0.05s;
-}
-
-.vesh_magazina button:hover, #knopka_rebirtha:hover {
-    background-color: #ff5555; 
-}
-
-.vesh_magazina button:active, #knopka_rebirtha:active {
-    transform: scale(0.96); 
-}
+obnovit_ekran();
