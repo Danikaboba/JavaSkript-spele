@@ -1,190 +1,112 @@
-// --- ИГРОВОЕ СОСТОЯНИЕ (STATE) ---
-let coins = 0;
-
-let autoClickers = 0;
-let autoClickerCost = 10;
-
-let clickLevel = 1;
-let clickUpgradeCost = 15;
-
-let critChance = 1; 
-let critUpgradeCost = 50;
-
-let crystals = 0;
-const REBIRTH_REQUIREMENT = 1000; 
-
-// Переменные для отслеживания временных таймеров ошибок (чтобы надписи не накладывались)
-let clickErrorTimeout, autoErrorTimeout, critErrorTimeout, rebirthErrorTimeout;
-
-// --- DOM ЭЛЕМЕНТЫ ---
-const coinsDisplay = document.getElementById('coins');
-const cpsDisplay = document.getElementById('cps');
-const cpcDisplay = document.getElementById('cpc');
-const crystalsDisplay = document.getElementById('crystals');
-const multiplierDisplay = document.getElementById('multiplier');
-
-const clickBtn = document.getElementById('akmens_poga'); 
-
-const buyAutoClickerBtn = document.getElementById('buy-auto-clicker');
-const buyClickUpgradeBtn = document.getElementById('buy-click-upgrade');
-const buyCritUpgradeBtn = document.getElementById('buy-crit-upgrade');
-const rebirthBtn = document.getElementById('rebirth-btn');
-
-const clickLevelDisplay = document.getElementById('click-level');
-const autoCountDisplay = document.getElementById('upgrade-count');
-const critChanceDisplay = document.getElementById('crit-chance');
-
-// РАСЧЕТЫ
-function getMultiplier() {
-    return 1 + (crystals * 0.5);
+.fons {
+    background-color: #2b2b2b;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
 }
 
-function getClickPower() {
-    return clickLevel * getMultiplier();
+.glavnoe_okno {
+    text-align: center;
+    background-color: #3d3d3d;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    width: 360px;
 }
 
-function getCps() {
-    return autoClickers * getMultiplier();
+h1 {
+    font-size: 32px;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
-// ОБЫЧНОЕ ОБНОВЛЕНИЕ ТЕКСТА КНОПОК
-// Эта функция ставит стандартный текст (название + цена)
-function updateUI() {
-    coinsDisplay.textContent = Math.floor(coins);
-    cpsDisplay.textContent = getCps().toFixed(1);
-    cpcDisplay.textContent = getClickPower().toFixed(1);
-    
-    crystalsDisplay.textContent = crystals;
-    multiplierDisplay.textContent = getMultiplier().toFixed(1);
-
-    clickLevelDisplay.textContent = clickLevel;
-    autoCountDisplay.textContent = autoClickers;
-    critChanceDisplay.textContent = critChance;
-
-    // Если прямо сейчас НЕ показывается ошибка нехватки денег, обновляем стандартную цену
-    if (!clickErrorTimeout) {
-        buyClickUpgradeBtn.textContent = `Klikšķis +1 (${clickUpgradeCost})`;
-    }
-    if (!autoErrorTimeout) {
-        buyAutoClickerBtn.textContent = `Auto +1/s (${autoClickerCost})`;
-    }
-    if (!critErrorTimeout) {
-        if (critChance >= 50) {
-            buyCritUpgradeBtn.textContent = "MAX līmenis";
-        } else {
-            buyCritUpgradeBtn.textContent = `Krita iespēja +2% (${critUpgradeCost})`;
-        }
-    }
-    if (!rebirthErrorTimeout) {
-        rebirthBtn.textContent = `Rebirth (Maksā: ${REBIRTH_REQUIREMENT})`;
-    }
+/* Стиль для текста камней */
+.tekst_kamney {
+    color: #a8a8a8; 
+    margin-bottom: 12px; 
+    font-weight: bold; 
+    font-size: 18px;
 }
 
-//ОБРАБОТКА НАЖАТИЙ С ПРОВЕРКОЙ ВНУТРИ КЛИКА
+/* Настройки главного счетчика монет */
+.bolshie_moneti {
+    font-size: 36px; 
+    font-weight: bold;
+}
 
-// Клик по камню
-clickBtn.addEventListener('click', () => {
-    let currentClickPower = getClickPower();
-    const isCrit = Math.floor(Math.random() * 100) + 1 <= critChance;
-    
-    if (isCrit) {
-        currentClickPower = currentClickPower * 10; 
-    }
+.tekst_monet {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
 
-    coins += currentClickPower;
-    updateUI();
-});
+.dop_tekst {
+    font-size: 16px;
+    color: #aaaaaa;
+}
 
-// Клик по прокачке клика
-buyClickUpgradeBtn.addEventListener('click', () => {
-    if (coins >= clickUpgradeCost) {
-        // Если денег хватает — покупаем
-        coins -= clickUpgradeCost;
-        clickLevel += 1;
-        clickUpgradeCost = Math.round(clickUpgradeCost * 1.5);
-        updateUI();
-    } else {
-        // ЕСЛИ НЕ ХВАТАЕТ:
-        let missing = clickUpgradeCost - Math.floor(coins);
-        buyClickUpgradeBtn.textContent = `Trūkst ${missing} monētas!`; // Меняем текст на ошибку
-        
-        // Сбрасываем старый таймер, если игрок спамит кликами по кнопке
-        clearTimeout(clickErrorTimeout); 
-        
-        // Через 1.5 секунды (1500 мс) возвращаем цену обратно
-        clickErrorTimeout = setTimeout(() => {
-            clickErrorTimeout = null;
-            updateUI();
-        }, 1500);
-    }
-});
+#knopka_kamnja {
+    background-image: url('5798437966812553226.webp');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    width: 220px;  
+    height: 190px; 
+    border: none;
+    cursor: pointer;
+    transition: transform 0.05s;
+    margin: 25px auto 10px auto;
+    display: block;
+    filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.6)); 
+}
 
-// Клик по автокликеру
-buyAutoClickerBtn.addEventListener('click', () => {
-    if (coins >= autoClickerCost) {
-        coins -= autoClickerCost;
-        autoClickers += 1;
-        autoClickerCost = Math.round(autoClickerCost * 1.4);
-        updateUI();
-    } else {
-        let missing = autoClickerCost - Math.floor(coins);
-        buyAutoClickerBtn.textContent = `Trūkst ${missing} monētas!`;
-        clearTimeout(autoErrorTimeout);
-        autoErrorTimeout = setTimeout(() => {
-            autoErrorTimeout = null;
-            updateUI();
-        }, 1500);
-    }
-});
+#knopka_kamnja:active {
+    transform: scale(0.92);
+    filter: drop-shadow(0px 4px 5px rgba(0,0,0,0.6));
+}
 
-// Клик по прокачке крита
-buyCritUpgradeBtn.addEventListener('click', () => {
-    if (critChance >= 50) return; // Если макс уровень, ничего не делаем
+.statistika_kamnja {
+    font-size: 14px;
+    color: #bbb;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 10px;
+}
 
-    if (coins >= critUpgradeCost) {
-        coins -= critUpgradeCost;
-        critChance += 2; 
-        critUpgradeCost = Math.round(critUpgradeCost * 2.2); 
-        updateUI();
-    } else {
-        let missing = critUpgradeCost - Math.floor(coins);
-        buyCritUpgradeBtn.textContent = `Trūkst ${missing} monētas!`;
-        clearTimeout(critErrorTimeout);
-        critErrorTimeout = setTimeout(() => {
-            critErrorTimeout = null;
-            updateUI();
-        }, 1500);
-    }
-});
+.magazin, .rebirth_prokachka {
+    margin-top: 20px;
+    border-top: 2px solid #555;
+    padding-top: 15px;
+}
 
-// Клик по кнопке Ребиртха
-rebirthBtn.addEventListener('click', () => {
-    if (coins >= REBIRTH_REQUIREMENT) {
-        crystals += 1;
-        coins = 0;
-        autoClickers = 0;
-        autoClickerCost = 10;
-        clickLevel = 1;
-        clickUpgradeCost = 15;
-        alert("Tu esi veiksmīgi atdzimis! Saņemts 1 💎 Kristāls.");
-        updateUI();
-    } else {
-        let missing = REBIRTH_REQUIREMENT - Math.floor(coins);
-        rebirthBtn.textContent = `Trūkst ${missing} monētas!`;
-        clearTimeout(rebirthErrorTimeout);
-        rebirthErrorTimeout = setTimeout(() => {
-            rebirthErrorTimeout = null;
-            updateUI();
-        }, 1500);
-    }
-});
+.vesh_magazina {
+    margin-bottom: 12px;
+}
 
-// --- АВТО---
-setInterval(() => {
-    if (autoClickers > 0) {
-        coins += getCps() / 10;
-        updateUI(); // Это обновляет монеты на экране, не трогая текст ошибок
-    }
-}, 100);
+.vesh_magazina button, #knopka_rebirtha {
+    background-color: #ff3333; 
+    color: white;
+    border: none;              
+    padding: 12px 15px; 
+    font-size: 16px;    
+    cursor: pointer;
+    border-radius: 8px;
+    width: 100%;
+    font-weight: bold;
+    transition: background-color 0.1s, transform 0.05s;
+}
 
-updateUI();
+.vesh_magazina button:hover, #knopka_rebirtha:hover {
+    background-color: #ff5555; 
+}
+
+.vesh_magazina button:active, #knopka_rebirtha:active {
+    transform: scale(0.96); 
+}
