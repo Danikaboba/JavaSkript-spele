@@ -9,7 +9,7 @@
     margin: 0;
 }
 
-.galvenais_logs {
+.glavnoe_okno {
     text-align: center;
     background-color: #3d3d3d;
     padding: 30px;
@@ -24,13 +24,36 @@ h1 {
     margin-bottom: 15px;
 }
 
-#akmens_poga {
+/* Стиль для текста камней */
+.tekst_kamney {
+    color: #a8a8a8; 
+    margin-bottom: 12px; 
+    font-weight: bold; 
+    font-size: 18px;
+}
+
+/* Настройки главного счетчика монет */
+.bolshie_moneti {
+    font-size: 36px; 
+    font-weight: bold;
+}
+
+.tekst_monet {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.dop_tekst {
+    font-size: 16px;
+    color: #aaaaaa;
+}
+
+#knopka_kamnja {
     background-image: url('5798437966812553226.webp');
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
     background-color: transparent;
-    
     width: 220px;  
     height: 190px; 
     border: none;
@@ -38,16 +61,15 @@ h1 {
     transition: transform 0.05s;
     margin: 25px auto 10px auto;
     display: block;
-    
     filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.6)); 
 }
 
-#akmens_poga:active {
+#knopka_kamnja:active {
     transform: scale(0.92);
     filter: drop-shadow(0px 4px 5px rgba(0,0,0,0.6));
 }
 
-.akmens_statistika {
+.statistika_kamnja {
     font-size: 14px;
     color: #bbb;
     margin-bottom: 20px;
@@ -58,18 +80,17 @@ h1 {
     padding: 0 10px;
 }
 
-.veikals, .rebirth_prokachka {
+.magazin, .rebirth_prokachka {
     margin-top: 20px;
     border-top: 2px solid #555;
     padding-top: 15px;
 }
 
-.veikala_lieta {
+.vesh_magazina {
     margin-bottom: 12px;
 }
 
-/* КНОПКИ ВСЕГДА КРАСНЫЕ И КЛИКАБЕЛЬНЫЕ */
-button[id^="buy-"], #rebirth-btn {
+.vesh_magazina button, #knopka_rebirtha {
     background-color: #ff3333; 
     color: white;
     border: none;              
@@ -82,11 +103,10 @@ button[id^="buy-"], #rebirth-btn {
     transition: background-color 0.1s, transform 0.05s;
 }
 
-button[id^="buy-"]:hover, #rebirth-btn:hover {
-    background-color: #ff5555; /* Подсветка при наведении работает всегда */
+.vesh_magazina button:hover, #knopka_rebirtha:hover {
+    background-color: #ff5555; 
 }
 
-/* Эффект нажатия теперь работает всегда, создавая кликабельность */
-button[id^="buy-"]:active, #rebirth-btn:active {
+.vesh_magazina button:active, #knopka_rebirtha:active {
     transform: scale(0.96); 
 }
